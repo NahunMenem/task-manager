@@ -12,6 +12,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskuser -d taskdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   api:
     build:
@@ -19,13 +24,15 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql://taskuser:taskpass@postgres:5432/taskdb
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       PORT: 3001
     ports:
       - "3001:3001"
+    command: sh -c "npx prisma db push && node dist/index.js"
 
   web:
     build:
