@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Task } from "@/lib/api";
+import { Type, AlignLeft, Tag, Calendar, Loader2 } from "lucide-react";
 
 const schema = z.object({
   title: z.string().min(1, "Title is required").max(255),
@@ -19,8 +20,7 @@ interface Props {
   onCancel: () => void;
 }
 
-const inputClass = "w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-gray-50 focus:bg-white";
-const labelClass = "block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5";
+const inputClass = "w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-50 focus:bg-white transition";
 
 export function TaskForm({ initialData, onSubmit, onCancel }: Props) {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<TaskFormData>({
@@ -36,54 +36,48 @@ export function TaskForm({ initialData, onSubmit, onCancel }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div>
-        <label className={labelClass}>Title <span className="text-red-400">*</span></label>
-        <input
-          {...register("title")}
-          placeholder="What needs to be done?"
-          className={inputClass}
-        />
+        <label className="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+          <Type className="w-3.5 h-3.5" /> Title <span className="text-red-400">*</span>
+        </label>
+        <input {...register("title")} placeholder="What needs to be done?" className={inputClass} />
         {errors.title && <p className="text-red-500 text-xs mt-1.5">{errors.title.message}</p>}
       </div>
 
       <div>
-        <label className={labelClass}>Description</label>
-        <textarea
-          {...register("description")}
-          rows={3}
-          placeholder="Add some details…"
-          className={`${inputClass} resize-none`}
-        />
+        <label className="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+          <AlignLeft className="w-3.5 h-3.5" /> Description
+        </label>
+        <textarea {...register("description")} rows={3} placeholder="Add some details…"
+          className={`${inputClass} resize-none`} />
         {errors.description && <p className="text-red-500 text-xs mt-1.5">{errors.description.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelClass}>Status</label>
+          <label className="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+            <Tag className="w-3.5 h-3.5" /> Status
+          </label>
           <select {...register("status")} className={inputClass}>
-            <option value="PENDING">Pending</option>
-            <option value="DONE">Done</option>
+            <option value="PENDING">⏳ Pending</option>
+            <option value="DONE">✅ Done</option>
           </select>
         </div>
         <div>
-          <label className={labelClass}>Due date</label>
+          <label className="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+            <Calendar className="w-3.5 h-3.5" /> Due date
+          </label>
           <input {...register("dueDate")} type="date" className={inputClass} />
         </div>
       </div>
 
-      <div className="flex gap-2 justify-end pt-1 border-t border-gray-100 mt-1">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium text-gray-600"
-        >
+      <div className="flex gap-2 justify-end pt-2 border-t border-gray-100">
+        <button type="button" onClick={onCancel}
+          className="px-4 py-2 text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition font-semibold text-gray-600">
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="px-5 py-2 text-sm rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 font-semibold transition-colors shadow-sm shadow-indigo-200"
-        >
-          {isSubmitting ? "Saving…" : initialData ? "Save changes" : "Create task"}
+        <button type="submit" disabled={isSubmitting}
+          className="px-5 py-2 text-sm rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white disabled:opacity-50 font-bold transition-all shadow-sm shadow-indigo-200 flex items-center gap-2">
+          {isSubmitting ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving…</> : initialData ? "Save changes" : "Create task"}
         </button>
       </div>
     </form>

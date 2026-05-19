@@ -1,4 +1,5 @@
 import { Task } from "@/lib/api";
+import { Pencil, Trash2, Calendar, CheckCircle2, Circle, AlertTriangle } from "lucide-react";
 
 interface Props {
   task: Task;
@@ -12,28 +13,20 @@ export function TaskCard({ task, onEdit, onDelete, onToggleStatus }: Props) {
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && !isDone;
 
   return (
-    <div
-      data-testid="task-card"
-      className={`bg-white rounded-2xl border p-4 shadow-sm transition-all hover:shadow-md ${
-        isDone ? "border-gray-100 opacity-70" : isOverdue ? "border-red-200" : "border-gray-200"
+    <div data-testid="task-card"
+      className={`bg-white rounded-2xl border p-4 shadow-sm transition-all hover:shadow-md group ${
+        isDone ? "border-gray-100 opacity-70" : isOverdue ? "border-red-200 bg-red-50/20" : "border-gray-200 hover:border-indigo-200"
       }`}
     >
       <div className="flex items-start gap-3">
-        {/* Toggle button */}
-        <button
-          onClick={() => onToggleStatus(task)}
+        {/* Toggle */}
+        <button onClick={() => onToggleStatus(task)}
           aria-label={isDone ? "Mark as pending" : "Mark as done"}
-          className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-            isDone
-              ? "bg-emerald-500 border-emerald-500 text-white"
-              : "border-gray-300 hover:border-indigo-400 hover:bg-indigo-50"
-          }`}
-        >
-          {isDone && (
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          )}
+          className="mt-0.5 flex-shrink-0 transition-transform hover:scale-110">
+          {isDone
+            ? <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            : <Circle className="w-5 h-5 text-gray-300 hover:text-indigo-400" />
+          }
         </button>
 
         {/* Content */}
@@ -45,47 +38,40 @@ export function TaskCard({ task, onEdit, onDelete, onToggleStatus }: Props) {
             <p className="text-xs text-gray-500 mt-0.5 line-clamp-2 leading-relaxed">{task.description}</p>
           )}
 
-          {/* Meta row */}
-          <div className="flex items-center gap-2 mt-2">
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+          <div className="flex items-center flex-wrap gap-2 mt-2.5">
+            {/* Status badge */}
+            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
               isDone ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
             }`}>
               <span className={`w-1.5 h-1.5 rounded-full ${isDone ? "bg-emerald-500" : "bg-amber-500"}`} />
               {isDone ? "Done" : "Pending"}
             </span>
 
+            {/* Due date */}
             {task.dueDate && (
-              <span className={`text-xs font-medium flex items-center gap-1 ${
+              <span className={`inline-flex items-center gap-1 text-xs font-medium ${
                 isOverdue ? "text-red-500" : "text-gray-400"
               }`}>
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                {isOverdue ? "Overdue · " : ""}{new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                {isOverdue
+                  ? <AlertTriangle className="w-3 h-3" />
+                  : <Calendar className="w-3 h-3" />
+                }
+                {isOverdue ? "Overdue · " : ""}
+                {new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               </span>
             )}
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-0.5 flex-shrink-0">
-          <button
-            onClick={() => onEdit(task)}
-            aria-label="Edit task"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
-            </svg>
+        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onClick={() => onEdit(task)} aria-label="Edit task"
+            className="p-2 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
+            <Pencil className="w-3.5 h-3.5" />
           </button>
-          <button
-            onClick={() => onDelete(task.id)}
-            aria-label="Delete task"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3M3 7h18" />
-            </svg>
+          <button onClick={() => onDelete(task.id)} aria-label="Delete task"
+            className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
